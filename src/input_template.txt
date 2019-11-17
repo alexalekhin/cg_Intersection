@@ -1,0 +1,5 @@
+NUMBER_OF_HALF_PLAINS
+A1 B1 C1 // Corresponds to A1*x+B1*y+C1 >= 0
+A2 B2 C2 // Corresponds to A2*x+B2*y+C2 >= 0
+A3 B3 C3 // Corresponds to A3*x+B3*y+C3 >= 0
+...
