@@ -4,13 +4,15 @@ import EPSILON
 import kotlin.math.*
 
 data class Line(val a: Double, val b: Double, val c: Double) {
-    /* If intersected returns point else null */
+
     fun isIntersectedBy(line: Line): Point? {
-        return if ((a / b) / (line.a / line.b) == 1.0) {
-            null
-        } else {
-            val y = (line.a * c - a * line.c) / (a * line.b - b * line.a)
-            Point((-c - b * y) / a, y)
+        return when {
+            abs(b) <= EPSILON && abs(line.b) <= EPSILON -> null
+            (abs((a / b) / (line.a / line.b) - 1.0) <= EPSILON) -> null
+            else -> {
+                val y = (line.a * c - a * line.c) / (a * line.b - b * line.a)
+                Point((-c - b * y) / a, y)
+            }
         }
     }
 
@@ -35,7 +37,6 @@ data class Line(val a: Double, val b: Double, val c: Double) {
             val coefficients = lineString.split(" ").map { it.toDouble() }
             Line(coefficients[0], coefficients[1], coefficients[2])
         } catch (e: NumberFormatException) {
-//            Log.debug("Error in Line parsing")
             null
         }
     }

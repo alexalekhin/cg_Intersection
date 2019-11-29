@@ -10,21 +10,25 @@ import kotlin.math.min
 //Common
 const val EPSILON = 0.000001
 // Left
-const val TOP_LEFT_ANGLE = 0.0
-const val BOTTOM_LEFT_ANGLE = PI - EPSILON
+const val LEFT_START_ANGLE = (0.0 + EPSILON)
+const val LEFT_END_ANGLE = PI
 // Right
-const val TOP_RIGHT_ANGLE = TOP_LEFT_ANGLE - EPSILON
-const val BOTTOM_RIGHT_ANGLE = -PI
-val LEFT_RANGE = TOP_LEFT_ANGLE..BOTTOM_LEFT_ANGLE
-val RIGHT_RANGE = BOTTOM_RIGHT_ANGLE..TOP_RIGHT_ANGLE
+const val RIGHT_START_ANGLE = -(PI - EPSILON)
+const val RIGHT_END_ANGLE = 0.0
+
+val LEFT_RANGE = LEFT_START_ANGLE..LEFT_END_ANGLE
+val RIGHT_RANGE = RIGHT_START_ANGLE..RIGHT_END_ANGLE
 
 fun checkIsLeft(angle: Double) = (angle in LEFT_RANGE)
 
 fun checkIsRight(angle: Double) = (angle in RIGHT_RANGE)
 
 fun main(args: Array<String>) {
-    val res = findIntersection(parseHalfPlainsFromFile(File(args[0])).toMutableList())
-    print("")
+    val halfPlains = parseHalfPlainsFromFile(File(args[0])).toMutableList()
+    val res = findIntersection(halfPlains)
+    res?.run {
+        File(args[1]).writeText((leftEdges + rightEdges.reversed()).map { halfPlains.indexOf(it) + 1 }.joinToString(", "))
+    }
 }
 
 fun parseHalfPlainsFromFile(file: File): List<HalfPlain> {
@@ -139,7 +143,13 @@ fun findIntersectionOfPolygons(polygon1: Polygon?, polygon2: Polygon?) = when {
 
                 // Find top - event point and event line (half-plain)
                 var lastEventPoint = Point(0.0, 0.0)
-                val topEventPointY = min(polygon1.findTop().y, polygon2.findTop().y) // FIXME: both -Infinite
+                val topEventPointY = min(polygon1.findTop().y, polygon2.findTop().y)
+                // FIXME: both Infinite
+                // TODO: special case when both tops are infinite
+                if (topEventPointY == Double.POSITIVE_INFINITY) {
+                    leftEdges.add(listOf(polygon1.leftEdges[0], polygon2.leftEdges[0]).minBy { abs(-it.line.c / it.line.a) }!!)
+                    rightEdges.add(listOf(polygon1.rightEdges[0], polygon2.rightEdges[0]).minBy { abs(-it.line.c / it.line.a) }!!)
+                }
                 val endEventPoint = listOf(polygon1.findBottom(), polygon2.findBottom()).minBy { it.y }!!
                 val eventPointQueue = mutableListOf<Point>().apply {
                     addAll(listOf(polygon1.findTop(), polygon2.findTop()).filter {

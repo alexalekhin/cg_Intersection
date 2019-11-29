@@ -2,7 +2,7 @@ package entities
 
 data class HalfPlain(val line: Line, val isClosed: Boolean = true) {
 
-    fun isPointInside(point: Point) = (line.a * point.x + line.b * point.y + line.c >= 0)
+    fun isPointInside(point: Point) = (line.a * point.x + line.b * point.y + line.c >= 0.0)
     fun isPointOnLine(point: Point) = line.isPointInside(point)
 
     fun isIntersectedBy(halfPlain: HalfPlain?) = halfPlain?.line?.isIntersectedBy(line)
